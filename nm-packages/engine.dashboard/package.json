@@ -3,10 +3,11 @@
   "version": "4.0.0-alpha.124",
   "description": "A dashboard for visualizing and interacting with the engine instance",
   "scripts": {
-    "test": "echo \"engine-service-web test\"",
+    "test": "playwright test",
     "start": "DASHBOARD_DEV=true ./dist/cli.js start",
     "build": "yarn clean && babel cli common --out-dir dist --extensions \".ts\" && chmod +x dist/cli.js",
-    "clean": "rm -rf ./dist"
+    "clean": "rm -rf ./dist",
+    "postinstall": "playwright install chromium"
   },
   "license": "MIT",
   "files": [
@@ -18,6 +19,7 @@
   "devDependencies": {
     "@babel/cli": "^7.19.3",
     "@c11/engine.service-web": "4.0.0-alpha.122",
+    "@playwright/test": "^1.60.0",
     "@types/babel__core": "^7",
     "@types/body-parser": "^1",
     "@types/cors": "^2",

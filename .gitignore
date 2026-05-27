@@ -27,3 +27,5 @@ engine.output.json
 packages/*/.yarn
 nm-packages/*/.yarn
 .history
+prompts
+test-results
