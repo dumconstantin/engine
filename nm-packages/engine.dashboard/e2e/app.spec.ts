@@ -1,18 +1,6 @@
 import { test, expect } from "@playwright/test";
-import { readFileSync } from "fs";
-import { join } from "path";
-
-const appStructure = JSON.parse(
-  readFileSync(join(__dirname, "../.app-structure.json"), "utf-8")
-);
 
 test.beforeEach(async ({ page }) => {
-  await page.route("http://localhost:3000/app-structure", (route) =>
-    route.fulfill({ json: appStructure })
-  );
-  // Prevent WebSocket connection errors — the dashboard connects but we don't need live events
-  await page.routeWebSocket("ws://localhost:7071/ws", () => {});
-
   await page.goto("/");
   // The tab list only renders once structure data is processed through all producers
   await expect(page.getByRole("tablist")).toBeVisible();
