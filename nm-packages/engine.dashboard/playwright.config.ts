@@ -17,10 +17,8 @@ export default defineConfig({
     },
   ],
   webServer: {
-    command: "yarn start",
-    // Wait for the /app-structure endpoint — it returns 200 only after webpack has
-    // finished compiling and written .app-structure.json, so it gates both servers
-    url: "http://localhost:3000/app-structure",
+    command: "yarn run build && yarn run start",
+    url: "http://localhost:8081",
     reuseExistingServer: !process.env.CI,
     timeout: 120_000,
   },
