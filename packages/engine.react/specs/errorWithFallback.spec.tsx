@@ -1,8 +1,8 @@
 import { engine } from "@c11/engine.runtime";
-import "@testing-library/jest-dom/extend-expect";
+import "@testing-library/jest-dom";
 import { getByTestId, waitFor } from "@testing-library/react";
 import React from "react";
-import { act } from "react-dom/test-utils";
+import { act } from "react";
 import { render } from "../src";
 
 const nextTick = process.nextTick;

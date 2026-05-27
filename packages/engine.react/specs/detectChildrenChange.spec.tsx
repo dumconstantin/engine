@@ -5,10 +5,10 @@ import {
   fireEvent,
   getNodeText,
 } from "@testing-library/react";
-import "@testing-library/jest-dom/extend-expect";
+import "@testing-library/jest-dom";
 import { render } from "../src";
 import { engine, producers } from "@c11/engine.runtime";
-import { act } from "react-dom/test-utils";
+import { act } from "react";
 
 const nextTick = process.nextTick;
 const flushPromises = () => {

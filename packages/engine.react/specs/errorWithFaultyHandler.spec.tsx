@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { waitFor, getByTestId, getByText } from "@testing-library/react";
-import "@testing-library/jest-dom/extend-expect";
+import "@testing-library/jest-dom";
 import { render } from "../src";
 import { engine } from "@c11/engine.runtime";
 

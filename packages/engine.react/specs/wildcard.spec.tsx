@@ -1,7 +1,7 @@
 import React from "react";
 import { waitFor, getByTestId, fireEvent } from "@testing-library/react";
-import "@testing-library/jest-dom/extend-expect";
-import { act } from "react-dom/test-utils";
+import "@testing-library/jest-dom";
+import { act } from "react";
 import { engine, producers, wildcard } from "@c11/engine.runtime";
 import { render } from "../src";
 
