@@ -29,3 +29,12 @@ nm-packages/*/.yarn
 .history
 prompts
 test-results
+
+# CocoIndex
+cocoindex/__pycache__/
+cocoindex/.venv/
+cocoindex/cocoindex/
+cocoindex/.env
+
+.env
+.mcp.json
