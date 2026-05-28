@@ -38,3 +38,4 @@ cocoindex/.env
 
 .env
 .mcp.json
+.claude/plans
