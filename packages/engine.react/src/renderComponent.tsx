@@ -1,18 +1,11 @@
 import React, { useEffect } from "react";
-import { BaseState } from "./types";
-// import { calculateExtraProps } from './calculateExtraProps';
 
-export const RenderComponent = ({
-  fn,
-  viewId,
-  state,
-  onMount,
-  ...other
-}: any) => {
+export const RenderComponent = ({ fn, viewId, state, onMount }: any) => {
   let extraProps = {
     "data-viewid": viewId,
     //TODO: add view name/location for debugging
   };
+  // runs on every render to re-record the view hierarchy after re-renders
   useEffect(() => {
     onMount();
   });

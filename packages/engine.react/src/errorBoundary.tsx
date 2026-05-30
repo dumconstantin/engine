@@ -1,4 +1,5 @@
 import React from "react";
+import type { ProducerMeta } from "@c11/engine.types";
 
 export class ErrorBoundary extends React.Component<
   any,
@@ -23,6 +24,61 @@ export class ErrorBoundary extends React.Component<
           error={this.state.error}
           viewId={this.state.parentViewId}
         />
+      );
+    }
+    return this.props.children;
+  }
+}
+
+type ViewErrorBoundaryProps = {
+  viewId: string;
+  meta: ProducerMeta;
+  errorFallback: (
+    error: Error,
+    viewId: string,
+    viewMeta: ProducerMeta
+  ) => React.ReactElement;
+  children?: React.ReactNode;
+};
+
+/**
+ * Error boundary for a view's render output. On error it asks the render
+ * module for a fallback (which applies the user-supplied `onError` handler)
+ * and renders it inside a plain `ErrorBoundary` so a faulty fallback still
+ * degrades to the default error UI.
+ */
+export class ViewErrorBoundary extends React.Component<
+  ViewErrorBoundaryProps,
+  { error: Error | null }
+> {
+  state: { error: Error | null } = { error: null };
+
+  static getDerivedStateFromError(error: Error) {
+    return { error };
+  }
+
+  componentDidCatch(error: any, errorInfo: any) {
+    console.error("componentDidCatch", error, errorInfo);
+  }
+
+  render() {
+    if (this.state.error) {
+      let fallbackElement: React.ReactElement;
+      try {
+        fallbackElement = this.props.errorFallback(
+          this.state.error,
+          this.props.viewId,
+          this.props.meta
+        );
+      } catch (e) {
+        fallbackElement = (
+          <DefaultError error={this.state.error} viewId={this.props.viewId} />
+        );
+      }
+      return (
+        <ErrorBoundary viewId={this.props.viewId}>
+          {fallbackElement}
+        </ErrorBoundary>
       );
     }
     return this.props.children;

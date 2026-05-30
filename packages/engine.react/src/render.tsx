@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
+import { createRoot } from "react-dom/client";
 import { randomId } from "@c11/engine.utils";
 import {
   RenderInstance,
@@ -14,14 +15,6 @@ import {
 } from "@c11/engine.types";
 import { ViewProvider } from "./context";
 import { DefaultError } from "./errorBoundary";
-
-let ReactDOM: any;
-let createRoot: any;
-if (parseInt(React.version.split(".")[0]) >= 18) {
-  createRoot = require("react-dom/client").createRoot;
-} else {
-  ReactDOM = require("react-dom");
-}
 
 export type ModuleConfig = {
   debug?: boolean;
@@ -57,7 +50,7 @@ export type RenderContext = {
     error: Error,
     viewId: string,
     viewMeta: ProducerMeta
-  ) => JSX.Element;
+  ) => React.ReactElement;
 };
 
 type RenderConfig = {
@@ -70,7 +63,7 @@ type RenderConfig = {
     error: Error,
     viewId: string,
     viewMeta: ProducerMeta
-  ) => JSX.Element | undefined;
+  ) => React.ReactElement | undefined;
 };
 
 type InstanceApi = {
@@ -99,32 +92,35 @@ type AddProducerOpts = {
 };
 
 const wrapper = ({ Element, updateProps }: any) => {
-  return class Wrapper extends React.Component {
-    isAlreadyMounted = false;
-    nextState: any;
-    constructor(props: any) {
-      super(props);
+  return function Wrapper() {
+    const [state, setState] = useState<any>({});
+    const mountedRef = useRef(false);
+    const pendingRef = useRef<any>(null);
+    const registeredRef = useRef(false);
+
+    // register the prop updater synchronously (before mount) so updates that
+    // arrive early are queued and flushed once mounted
+    if (!registeredRef.current) {
+      registeredRef.current = true;
       if (updateProps) {
-        updateProps(this.updateProps.bind(this));
-      }
-      this.state = {};
-    }
-    componentDidMount() {
-      this.isAlreadyMounted = true;
-      if (this.nextState) {
-        this.setState(this.nextState);
-      }
-    }
-    updateProps(props: any) {
-      if (!this.isAlreadyMounted) {
-        this.nextState = props;
-      } else {
-        this.setState(props);
+        updateProps((props: any) => {
+          if (!mountedRef.current) {
+            pendingRef.current = props;
+          } else {
+            setState(props);
+          }
+        });
       }
     }
-    render() {
-      return React.cloneElement(Element, { ...this.state });
-    }
+
+    useEffect(() => {
+      mountedRef.current = true;
+      if (pendingRef.current) {
+        setState(pendingRef.current);
+      }
+    }, []);
+
+    return React.cloneElement(Element, { ...state });
   };
 };
 
@@ -282,21 +278,12 @@ export class Render implements RenderInstance {
       Element: this.element,
       updateProps: this.updateProps,
     });
-    if (createRoot) {
-      this.reactRoot = createRoot(rootEl);
-      this.reactRoot.render(
-        <ViewProvider value={this.context}>
-          <Wrapper />
-        </ViewProvider>
-      );
-    } else {
-      ReactDOM.render(
-        <ViewProvider value={this.context}>
-          <Wrapper />
-        </ViewProvider>,
-        rootEl
-      );
-    }
+    this.reactRoot = createRoot(rootEl);
+    this.reactRoot.render(
+      <ViewProvider value={this.context}>
+        <Wrapper />
+      </ViewProvider>
+    );
   }
   getRoot() {
     return this.root;
@@ -304,8 +291,6 @@ export class Render implements RenderInstance {
   unmount() {
     if (this.reactRoot) {
       this.reactRoot.unmount();
-    } else {
-      ReactDOM.unmountComponentAtNode(this.root);
     }
     return this;
   }
